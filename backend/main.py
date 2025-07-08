@@ -60,3 +60,19 @@ async def create_log(log_entry: LogEntry):
         raise  # Let FastAPI handle HTTPExceptions from validation
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.get("/logs/search")
+async def search_logs():
+    try:
+        response = client.search(index="logs-*", body={
+            "size": 20,
+            "query": {
+                "match_all": {}
+            },
+            "sort": [
+                {"timestamp": {"order": "desc"}}
+            ],
+        })
+        return [hit["_source"] for hit in response["hits"]["hits"]]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
