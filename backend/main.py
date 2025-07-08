@@ -62,13 +62,32 @@ async def create_log(log_entry: LogEntry):
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @app.get("/logs/search")
-async def search_logs():
+async def search_logs(
+    q: str = None,
+    level: str = None,
+    service: str = None,
+):
     try:
+        must_clauses = []
+        filter_clauses = []
+
+        if q:
+            must_clauses.append({"match": {"message": q}})
+        if level:
+            filter_clauses.append({"term": {"level": level}})
+        if service:
+            filter_clauses.append({"term": {"service": service}})
+
+        query = {
+            "bool": {
+                "must": must_clauses if must_clauses else [{"match_all": {}}],
+                "filter": filter_clauses
+            }
+        }
+
         response = client.search(index="logs-*", body={
             "size": 20,
-            "query": {
-                "match_all": {}
-            },
+            "query": query,
             "sort": [
                 {"timestamp": {"order": "desc"}}
             ],
