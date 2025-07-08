@@ -17,9 +17,9 @@ client = OpenSearch(
 )
 
 class LogEntry(BaseModel):
-    message: str
-    level: str
     timestamp: str
+    level: str
+    message: str
     service: str
 
     @field_validator('timestamp')
@@ -41,4 +41,22 @@ class LogEntry(BaseModel):
 
 @app.post("/logs")
 async def create_log(log_entry: LogEntry):
-    return log_entry
+    try:
+        # Parse the timestamp to get the date for the index name
+        date_obj = datetime.fromisoformat(log_entry.timestamp.replace("Z", "+00:00"))
+        index_name = f"logs-{date_obj.strftime('%Y.%m.%d')}"
+
+        # Create the index if it doesn't exist
+        if not client.indices.exists(index=index_name):
+            client.indices.create(index=index_name)
+
+        # Insert the log entry
+        response = client.index(index=index_name, body=log_entry.model_dump(), refresh=True)
+        return {
+            "id": response.get("_id"),
+            "log": log_entry.model_dump()
+        }
+    except HTTPException:
+        raise  # Let FastAPI handle HTTPExceptions from validation
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
