@@ -11,5 +11,19 @@ services:
       - "9600:9600"
     volumes:
       - opensearch-data:/usr/share/opensearch/data
+
+  backend:
+    build: ./backend
+    container_name: backend
+    environment:
+      - OPENSEARCH_HOST=${OPENSEARCH_HOST}
+      - OPENSEARCH_PORT=${OPENSEARCH_PORT}
+    ports:
+      - "${BACK_PORT}:8000"
+    depends_on:
+      - opensearch-node
+    volumes:
+      - ./backend:/app
+
 volumes:
   opensearch-data:
