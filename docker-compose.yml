@@ -25,5 +25,17 @@ services:
     volumes:
       - ./backend:/app
 
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "${FRONT_PORT}:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    
+
 volumes:
   opensearch-data:
