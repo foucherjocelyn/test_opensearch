@@ -1,29 +1,43 @@
 import axios from './axios';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
+type Log = {
+  timestamp: string;
+  level: string;
+  service: string;
+  message: string;
+};
 
 function App() {
-  const getLogs = async () => {
-    try {
-      const response = await axios.get('/logs/search');
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error fetching logs:', error);
-    }
-  };
+  const [logs, setLogs] = useState<Log[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // This effect runs once when the component mounts
   useEffect(() => {
-    getLogs();
+    async function fetchLogs() {
+      try {
+        const response = await axios.get('/logs/search');
+        setLogs(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(String(err));
+        setLoading(false);
+      }
+    }
+
+    fetchLogs();
   }, []);
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      <h1 className="text-4xl font-bold text-blue-600 mb-4">Welcome to Your React + Tailwind App</h1>
-      <p className="text-lg text-gray-700">
-        Start building your frontend!
-      </p>
-    </div>
-  )
+    <ul>
+      {logs.map((log, index) => (
+        <li key={index}>{log.timestamp} - {log.level} - {log.service} - {log.message}</li>
+      ))}
+    </ul>
+  );
 }
 
-export default App
+export default App;
