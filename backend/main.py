@@ -1,10 +1,26 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from opensearchpy import OpenSearch
 from pydantic import BaseModel, field_validator
 from datetime import datetime
 import os
 
 app = FastAPI()
+
+FRONT_HOST = os.getenv("FRONT_HOST")
+FRONT_PORT = int(os.getenv("FRONT_PORT"))
+
+origins = [
+    f"{FRONT_HOST}:{FRONT_PORT}",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 OPENSEARCH_HOST = os.getenv("OPENSEARCH_HOST")
 OPENSEARCH_PORT = int(os.getenv("OPENSEARCH_PORT"))

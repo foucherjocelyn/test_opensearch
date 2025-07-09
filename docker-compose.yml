@@ -18,6 +18,8 @@ services:
     environment:
       - OPENSEARCH_HOST=${OPENSEARCH_HOST}
       - OPENSEARCH_PORT=${OPENSEARCH_PORT}
+      - FRONT_HOST=${FRONT_HOST}
+      - FRONT_PORT=${FRONT_PORT}
     ports:
       - "${BACK_PORT}:8000"
     depends_on:
@@ -28,6 +30,8 @@ services:
   frontend:
     build: ./frontend
     container_name: frontend
+    environment:
+      - VITE_API_BASE_URL=${BACK_HOST}:${BACK_PORT}
     ports:
       - "${FRONT_PORT}:5173"
     volumes:
