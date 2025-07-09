@@ -87,12 +87,14 @@ async def search_logs(
         must_clauses = []
         filter_clauses = []
 
+        # we use .keyword to avoid case sensitivity issues
         if q:
             must_clauses.append({"match": {"message": q}})
         if level:
-            filter_clauses.append({"term": {"level": level}})
+            filter_clauses.append({"term": {"level.keyword": level}})
         if service:
-            filter_clauses.append({"term": {"service": service}})
+            filter_clauses.append({"term": {"service.keyword": service}})
+        
 
         query = {
             "bool": {
