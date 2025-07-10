@@ -8,15 +8,17 @@ import os
 app = FastAPI()
 
 FRONT_HOST = os.getenv("FRONT_HOST")
-FRONT_PORT = int(os.getenv("FRONT_PORT"))
+FRONT_PORT = os.getenv("FRONT_PORT")
 
-origins = [
-    f"{FRONT_HOST}:{FRONT_PORT}",
-]
+# Configure CORS
+if FRONT_HOST and FRONT_PORT:
+    origins = [f"{FRONT_HOST}:{FRONT_PORT}"]
+else:
+    origins = ["*"]  # fallback for dev or missing env
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Allows all origins
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
