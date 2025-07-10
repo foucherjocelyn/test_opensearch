@@ -13,17 +13,19 @@ function App() {
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [level, setLevel] = useState('');
-  const [service, setService] = useState('');
+  const [filters, setFilters] = useState({
+    search: '',
+    level: '',
+    service: ''
+  });
 
   useEffect(() => {
     async function fetchLogs() {
       try {
         const params = new URLSearchParams();
-        if (search) params.append('q', search);
-        if (level) params.append('level', level);
-        if (service) params.append('service', service);
+        if (filters.search) params.append('q', filters.search);
+        if (filters.level) params.append('level', filters.level);
+        if (filters.service) params.append('service', filters.service);
         const response = await axios.get('/logs/search', { params });
         setLogs(response.data);
         setLoading(false);
@@ -33,7 +35,7 @@ function App() {
       }
     }
     fetchLogs();
-  }, [search, level, service]);
+  }, [filters]);
 
   return (
     <div className="p-8">
@@ -42,13 +44,13 @@ function App() {
         <input
           type="text"
           placeholder="Search by message..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
+          value={filters.search}
+          onChange={e => setFilters({ ...filters, search: e.target.value })}
           className="border border-gray-300 rounded px-3 py-2 w-full max-w-md"
         />
         <select
-          value={level}
-          onChange={e => setLevel(e.target.value)}
+          value={filters.level}
+          onChange={e => setFilters({ ...filters, level: e.target.value })}
           className="border border-gray-300 rounded px-3 py-2 w-max max-w-3xs"
         >
           <option value="">Filter by level...</option>
@@ -60,8 +62,8 @@ function App() {
         <input
           type="text"
           placeholder="Filter by service..."
-          value={service}
-          onChange={e => setService(e.target.value)}
+          value={filters.service}
+          onChange={e => setFilters({ ...filters, service: e.target.value })}
           className="border border-gray-300 rounded px-3 py-2 w-full max-w-2xs"
         />
       </div>
