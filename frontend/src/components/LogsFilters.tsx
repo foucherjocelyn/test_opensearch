@@ -1,9 +1,8 @@
-import React from "react";
 import type { LogFilters } from "../types";
 
 interface LogsFiltersProps {
   filters: LogFilters;
-  setFilters: React.Dispatch<React.SetStateAction<LogFilters>>;
+  setFilters: (filters: LogFilters) => void;
 }
 
 export default function LogsFilters({ filters, setFilters }: LogsFiltersProps) {
