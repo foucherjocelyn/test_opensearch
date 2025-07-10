@@ -35,11 +35,6 @@ function App() {
     fetchLogs();
   }, [filters]);
 
-  const handleAddLog = async (data: { message: string; level: string; service: string }) => {
-    // TODO: implement actual POST logic
-    setShowAddModal(false);
-  };
-
   return (
     <div className="p-8 relative">
       <h1 className="text-2xl font-bold mb-4 text-center">Logs</h1>
@@ -58,7 +53,7 @@ function App() {
       <AddLogsFormModal
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
-        onSubmit={handleAddLog}
+
       />
 
       <div>

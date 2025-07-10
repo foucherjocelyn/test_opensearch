@@ -1,15 +1,40 @@
 import { useState } from "react";
+import axios from './axios';
 
 interface AddLogsFormModalProps {
   show: boolean;
   onClose: () => void;
-  onSubmit: (data: { message: string; level: string; service: string }) => void;
+
 }
 
-function AddLogsFormModal({ show, onClose, onSubmit }: AddLogsFormModalProps) {
+function AddLogsFormModal({ show, onClose }: AddLogsFormModalProps) {
   const [message, setMessage] = useState('');
   const [level, setLevel] = useState('');
   const [service, setService] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const timestamp = new Date().toISOString();
+      await axios.post('/logs', { message, level, service, timestamp });
+      
+      // Clear form and close modal on success
+      setMessage('');
+      setLevel('');
+      setService('');
+      onClose();
+      
+    } catch (err) {
+      setError('Failed to add log. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!show) return null;
 
@@ -24,29 +49,29 @@ function AddLogsFormModal({ show, onClose, onSubmit }: AddLogsFormModalProps) {
           &times;
         </button>
         <h2 className="text-xl font-bold mb-4">Add Log Entry</h2>
-        <form
-          onSubmit={e => {
-            e.preventDefault();
-            onSubmit({ message, level, service });
-            setMessage('');
-            setLevel('');
-            setService('');
-            onClose();
-          }}
-          className="flex flex-col gap-4"
-        >
+        
+        {/* Error message */}
+        {error && (
+          <div className="mb-4 px-3 py-2 bg-red-100 text-red-700 border border-red-300 rounded">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             className="border rounded px-3 py-2"
             placeholder="Message"
             value={message}
             onChange={e => setMessage(e.target.value)}
             required
+            disabled={isSubmitting}
           />
           <select
             className="border rounded px-3 py-2"
             value={level}
             onChange={e => setLevel(e.target.value)}
             required
+            disabled={isSubmitting}
           >
             <option value="">Select level...</option>
             <option value="INFO">INFO</option>
@@ -60,9 +85,14 @@ function AddLogsFormModal({ show, onClose, onSubmit }: AddLogsFormModalProps) {
             value={service}
             onChange={e => setService(e.target.value)}
             required
+            disabled={isSubmitting}
           />
-          <button type="submit" className="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700">
-            Add Log
+          <button 
+            type="submit" 
+            className="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700 disabled:opacity-50"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Adding...' : 'Add Log'}
           </button>
         </form>
       </div>
