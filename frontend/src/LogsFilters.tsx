@@ -1,14 +1,9 @@
 import React from "react";
-
-type Filters = {
-  search: string;
-  level: string;
-  service: string;
-};
+import type { FiltersModel } from "./Models/FilterModel";
 
 interface LogsFiltersProps {
-  filters: Filters;
-  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  filters: FiltersModel;
+  setFilters: React.Dispatch<React.SetStateAction<FiltersModel>>;
 }
 
 export default function LogsFilters({ filters, setFilters }: LogsFiltersProps) {

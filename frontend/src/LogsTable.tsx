@@ -1,12 +1,7 @@
-type Log = {
-  timestamp: string;
-  level: string;
-  service: string;
-  message: string;
-};
+import type { LogModel } from "./Models/LogModel";
 
 interface LogsTableProps {
-  logs: Log[];
+  logs: LogModel[];
 }
 
 function LogsTable({ logs }: LogsTableProps) {

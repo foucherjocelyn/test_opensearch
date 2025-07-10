@@ -2,19 +2,14 @@ import axios from './axios';
 import { useEffect, useState } from 'react';
 import LogsTable from './LogsTable';
 import LogsFilters from './LogsFilters';
-
-type Log = {
-  timestamp: string;
-  level: string;
-  service: string;
-  message: string;
-};
+import type { LogModel } from './Models/LogModel';
+import type { FiltersModel } from './Models/FilterModel';
 
 function App() {
-  const [logs, setLogs] = useState<Log[]>([]);
+  const [logs, setLogs] = useState<LogModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FiltersModel>({
     search: '',
     level: '',
     service: ''
