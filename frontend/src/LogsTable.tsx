@@ -1,7 +1,7 @@
-import type { LogModel } from "./Models/LogModel";
+import type { Log } from "./types";
 
 interface LogsTableProps {
-  logs: LogModel[];
+  logs: Log[];
 }
 
 function LogsTable({ logs }: LogsTableProps) {

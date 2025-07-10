@@ -3,14 +3,13 @@ import { useEffect, useState } from 'react';
 import LogsTable from './LogsTable';
 import LogsFilters from './LogsFilters';
 import AddLogsFormModal from './AddLogsFormModal';
-import type { LogModel } from './Models/LogModel';
-import type { FiltersModel } from './Models/FilterModel';
+import type { Log, LogFilters } from './types';
 
 function App() {
-  const [logs, setLogs] = useState<LogModel[]>([]);
+  const [logList, setLogList] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<FiltersModel>({
+  const [logFilters, setLogFilters] = useState<LogFilters>({
     search: '',
     level: '',
     service: ''
@@ -21,11 +20,11 @@ function App() {
     async function fetchLogs() {
       try {
         const params = new URLSearchParams();
-        if (filters.search) params.append('q', filters.search);
-        if (filters.level) params.append('level', filters.level);
-        if (filters.service) params.append('service', filters.service);
+        if (logFilters.search) params.append('q', logFilters.search);
+        if (logFilters.level) params.append('level', logFilters.level);
+        if (logFilters.service) params.append('service', logFilters.service);
         const response = await axios.get('/logs/search', { params });
-        setLogs(response.data);
+        setLogList(response.data);
         setLoading(false);
       } catch (err) {
         setError(String(err));
@@ -33,12 +32,12 @@ function App() {
       }
     }
     fetchLogs();
-  }, [filters]);
+  }, [logFilters]);
 
   return (
     <div className="p-8 relative">
       <h1 className="text-2xl font-bold mb-4 text-center">Logs</h1>
-      <LogsFilters filters={filters} setFilters={setFilters} />
+      <LogsFilters filters={logFilters} setFilters={setLogFilters} />
 
       {/* Floating + Button */}
       <button
@@ -59,7 +58,7 @@ function App() {
       <div>
         {loading && <div className="text-center mt-8 text-lg">Loading...</div>}
         {error && <div className="text-center mt-8 text-red-600">Error: {error}</div>}
-        {!loading && !error && <LogsTable logs={logs} />}
+        {!loading && !error && <LogsTable logs={logList} />}
       </div>
     </div>
   );
