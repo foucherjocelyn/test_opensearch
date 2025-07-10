@@ -2,6 +2,7 @@ import axios from './axios';
 import { useEffect, useState } from 'react';
 import LogsTable from './LogsTable';
 import LogsFilters from './LogsFilters';
+import AddLogsFormModal from './AddLogsFormModal';
 import type { LogModel } from './Models/LogModel';
 import type { FiltersModel } from './Models/FilterModel';
 
@@ -14,6 +15,7 @@ function App() {
     level: '',
     service: ''
   });
+  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     async function fetchLogs() {
@@ -33,10 +35,32 @@ function App() {
     fetchLogs();
   }, [filters]);
 
+  const handleAddLog = async (data: { message: string; level: string; service: string }) => {
+    // TODO: implement actual POST logic
+    setShowAddModal(false);
+  };
+
   return (
-    <div className="p-8">
+    <div className="p-8 relative">
       <h1 className="text-2xl font-bold mb-4 text-center">Logs</h1>
       <LogsFilters filters={filters} setFilters={setFilters} />
+
+      {/* Floating + Button */}
+      <button
+        onClick={() => setShowAddModal(true)}
+        className="fixed bottom-8 right-8 bg-blue-600 text-white rounded-full w-14 h-14 text-3xl shadow-lg hover:bg-blue-700 transition"
+        aria-label="Add log"
+      >
+        +
+      </button>
+
+      {/* Add Log Modal */}
+      <AddLogsFormModal
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={handleAddLog}
+      />
+
       <div>
         {loading && <div className="text-center mt-8 text-lg">Loading...</div>}
         {error && <div className="text-center mt-8 text-red-600">Error: {error}</div>}
