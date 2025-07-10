@@ -1,8 +1,8 @@
 import axios from './axios';
 import { useEffect, useState } from 'react';
-import LogsTable from './LogsTable';
-import LogsFilters from './LogsFilters';
-import AddLogsFormModal from './AddLogsFormModal';
+import LogsTable from './components/LogsTable';
+import LogsFilters from './components/LogsFilters';
+import AddLogsFormModal from './components/AddLogsFormModal';
 import type { Log, LogFilters } from './types';
 
 function App() {

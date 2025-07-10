@@ -1,5 +1,5 @@
 import React from "react";
-import type { LogFilters } from "./types";
+import type { LogFilters } from "../types";
 
 interface LogsFiltersProps {
   filters: LogFilters;

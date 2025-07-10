@@ -1,4 +1,4 @@
-import type { Log } from "./types";
+import type { Log } from "../types";
 
 interface LogsTableProps {
   logs: Log[];
