@@ -38,8 +38,8 @@ async def search_logs(
     service: str = None,
     # checks if page is greater than or equal to 1, defaulting to 1
     page: Annotated[int, Query(ge=1)] = 1,
+    size: Annotated[int, Query(ge=1)] = 20,  # Number of results per page
 ):
-    size = 20  # Number of results per page
     from_ = (page - 1) * size  # Calculate the starting index for pagination
     try:
         must_clauses = []

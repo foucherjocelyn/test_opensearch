@@ -7,7 +7,7 @@ import type { Log, LogFilters } from './types';
 import Pagination from './components/Pagination';
 
 function App() {
-  const itemsPerPage = 20; // Number of logs per page
+  const [itemsPerPage, setItemsPerPage] = useState(20); // Number of logs per page
   const [logList, setLogList] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ function App() {
   // Reset current page to 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [logFilters]);
+  }, [logFilters, itemsPerPage]);
 
   useEffect(() => {
     async function fetchLogs() {
@@ -33,6 +33,7 @@ function App() {
         if (logFilters.level) params.append('level', logFilters.level);
         if (logFilters.service) params.append('service', logFilters.service);
         params.append('page', String(currentPage));
+        params.append('size', String(itemsPerPage));
         const response = await axios.get('/logs/search', { params });
         setLogList(response.data);
         setLoading(false);
@@ -46,7 +47,7 @@ function App() {
       }
     }
     fetchLogs();
-  }, [logFilters, currentPage]);
+  }, [logFilters, currentPage, itemsPerPage]);
 
   return (
     <div className="p-8 relative">
@@ -56,6 +57,10 @@ function App() {
         currentPage={currentPage}
         onPageChange={(page: number) => setCurrentPage(page)}
         hasNextPage={hasNextPage}
+        itemsPerPage={itemsPerPage}
+        onItemsPerPageChange={(newItemsPerPage: number) => {
+          setItemsPerPage(newItemsPerPage);
+        }}
       />
 
       {/* Floating + Button */}
