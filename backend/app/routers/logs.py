@@ -1,5 +1,6 @@
 from datetime import datetime
-from fastapi import APIRouter, HTTPException
+from typing import Annotated
+from fastapi import APIRouter, HTTPException, Query
 from ..dependencies import client
 from app.models.log_entry import LogEntry
 
@@ -35,7 +36,11 @@ async def search_logs(
     q: str = None,
     level: str = None,
     service: str = None,
+    # checks if page is greater than or equal to 1, defaulting to 1
+    page: Annotated[int, Query(ge=1)] = 1,
 ):
+    size = 20  # Number of results per page
+    from_ = (page - 1) * size  # Calculate the starting index for pagination
     try:
         must_clauses = []
         filter_clauses = []
@@ -48,7 +53,7 @@ async def search_logs(
         if service:
             filter_clauses.append({"term": {"service.keyword": service}})
         
-
+        # Matches the different fields or everything if no filters are applied
         query = {
             "bool": {
                 "must": must_clauses if must_clauses else [{"match_all": {}}],
@@ -57,7 +62,8 @@ async def search_logs(
         }
 
         response = client.search(index="logs-*", body={
-            "size": 20,
+            "size": size,
+            "from": from_,
             "query": query,
             "sort": [
                 {"timestamp": {"order": "desc"}}
