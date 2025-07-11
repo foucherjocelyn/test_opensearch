@@ -1,63 +1,14 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from opensearchpy import OpenSearch
-from pydantic import BaseModel, field_validator
 from datetime import datetime
-import os
+from fastapi import APIRouter, HTTPException
+from ..dependencies import client
+from app.models.log_entry import LogEntry
 
-app = FastAPI()
-
-FRONT_HOST = os.getenv("FRONT_HOST")
-FRONT_PORT = os.getenv("FRONT_PORT")
-
-# Configure CORS
-if FRONT_HOST and FRONT_PORT:
-    origins = [f"{FRONT_HOST}:{FRONT_PORT}"]
-else:
-    origins = ["*"]  # fallback for dev or missing env
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+router = APIRouter(
+    prefix="/logs",
+    tags=["logs"],
 )
 
-OPENSEARCH_HOST = os.getenv("OPENSEARCH_HOST")
-OPENSEARCH_PORT = int(os.getenv("OPENSEARCH_PORT"))
-
-client = OpenSearch(
-    hosts=[{"host": OPENSEARCH_HOST, "port": OPENSEARCH_PORT}],
-    http_compress=True,
-    use_ssl=False,
-    verify_certs=False,
-)
-
-class LogEntry(BaseModel):
-    timestamp: str
-    level: str
-    message: str
-    service: str
-
-    @field_validator('timestamp')
-    @classmethod
-    def validate_timestamp(cls, v):
-        try:
-            datetime.fromisoformat(v.replace("Z", "+00:00"))
-        except Exception:
-            raise HTTPException(status_code=422, detail='timestamp must be a valid ISO 8601 string')
-        return v
-
-    @field_validator('level')
-    @classmethod
-    def validate_level(cls, v):
-        valid_levels = {'INFO', 'WARNING', 'ERROR', 'DEBUG'}
-        if v not in valid_levels:
-            raise HTTPException(status_code=422, detail=f'level must be one of {valid_levels}')
-        return v
-
-@app.post("/logs")
+@router.post("/")
 async def create_log(log_entry: LogEntry):
     try:
         # Parse the timestamp to get the date for the index name
@@ -79,7 +30,7 @@ async def create_log(log_entry: LogEntry):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
-@app.get("/logs/search")
+@router.get("/search")
 async def search_logs(
     q: str = None,
     level: str = None,
