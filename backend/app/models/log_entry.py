@@ -12,10 +12,12 @@ class LogEntry(BaseModel):
     @classmethod
     def validate_timestamp(cls, v):
         try:
-            datetime.fromisoformat(v.replace("Z", "+00:00"))
+            dt = datetime.fromisoformat(v.replace("Z", "+00:00"))
+            dt = dt.replace(microsecond=0)  # Remove microseconds
         except Exception:
             raise HTTPException(status_code=422, detail='timestamp must be a valid ISO 8601 string')
-        return v
+        # Return the timestamp string without microseconds
+        return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
     @field_validator('level')
     @classmethod
