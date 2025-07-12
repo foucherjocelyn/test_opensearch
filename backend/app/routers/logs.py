@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query
+
 from ..dependencies import client
+from app.models.log_search_params import LogSearchParams
 from app.models.log_entry import LogEntry
 
 router = APIRouter(
@@ -33,25 +35,20 @@ async def create_log(log_entry: LogEntry):
 
 @router.get("/search")
 async def search_logs(
-    q: str = None,
-    level: str = None,
-    service: str = None,
-    # checks if page is greater than or equal to 1, defaulting to 1
-    page: Annotated[int, Query(ge=1)] = 1,
-    size: Annotated[int, Query(ge=1)] = 20,  # Number of results per page
+    params: Annotated[LogSearchParams, Query()],
 ):
-    from_ = (page - 1) * size  # Calculate the starting index for pagination
+    from_ = (params.page - 1) * params.size  # Calculate the starting index for pagination
     try:
         must_clauses = []
         filter_clauses = []
 
         # we use .keyword to avoid case sensitivity issues
-        if q:
-            must_clauses.append({"match": {"message": q}})
-        if level:
-            filter_clauses.append({"term": {"level.keyword": level}})
-        if service:
-            filter_clauses.append({"term": {"service.keyword": service}})
+        if params.q:
+            must_clauses.append({"match": {"message": params.q}})
+        if params.level:
+            filter_clauses.append({"term": {"level.keyword": params.level}})
+        if params.service:
+            filter_clauses.append({"term": {"service.keyword": params.service}})
         
         # Matches the different fields or everything if no filters are applied
         query = {
@@ -62,7 +59,7 @@ async def search_logs(
         }
 
         response = client.search(index="logs-*", body={
-            "size": size,
+            "size": params.size,
             "from": from_,
             "query": query,
             "sort": [
