@@ -49,6 +49,12 @@ async def search_logs(
             filter_clauses.append({"term": {"level.keyword": params.level}})
         if params.service:
             filter_clauses.append({"term": {"service.keyword": params.service}})
+        if params.start_date:
+            filter_clauses.append({"range": {"timestamp": {"gte": f"{params.start_date}T00:00:00Z"}}})
+        if params.end_date:
+            filter_clauses.append({"range": {"timestamp": {"lte": f"{params.end_date}T23:59:59Z"}}})
+
+        print(f"filter_clauses: {filter_clauses}")
         
         # Matches the different fields or everything if no filters are applied
         query = {
