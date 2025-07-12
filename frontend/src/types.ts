@@ -9,4 +9,6 @@ export interface LogFilters {
   search: string;
   level: string;
   service: string;
+  startDate?: string;
+  endDate?: string;
 }

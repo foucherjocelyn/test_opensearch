@@ -32,6 +32,8 @@ function App() {
         if (logFilters.search) params.append('q', logFilters.search);
         if (logFilters.level) params.append('level', logFilters.level);
         if (logFilters.service) params.append('service', logFilters.service);
+        if (logFilters.startDate) params.append('start_date', logFilters.startDate);
+        if (logFilters.endDate) params.append('end_date', logFilters.endDate);
         params.append('page', String(currentPage));
         params.append('size', String(itemsPerPage));
         const response = await axios.get('/logs/search', { params });

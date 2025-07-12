@@ -6,6 +6,9 @@ interface LogsFiltersProps {
 }
 
 export default function LogsFilters({ filters, setFilters }: LogsFiltersProps) {
+    const minDate = "2010-01-01";
+    const maxDate = "2030-12-31";
+
     return (
         <div className="mb-4 flex justify-center gap-3">
             <input
@@ -32,6 +35,22 @@ export default function LogsFilters({ filters, setFilters }: LogsFiltersProps) {
                 value={filters.service}
                 onChange={e => setFilters({ ...filters, service: e.target.value })}
                 className="border border-gray-300 rounded px-3 py-2 w-full max-w-2xs"
+            />
+            <input
+                aria-label="Date from"
+                type="date"
+                min={minDate}
+                max={maxDate}
+                value={filters.startDate || ""}
+                onChange={e => setFilters({ ...filters, startDate: e.target.value })}
+            />
+            <input
+                aria-label="Date to"
+                type="date"
+                min={minDate}
+                max={maxDate}
+                value={filters.endDate || ""}
+                onChange={e => setFilters({ ...filters, endDate: e.target.value })}
             />
         </div>
     )
