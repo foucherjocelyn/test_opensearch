@@ -71,7 +71,7 @@ This will start the OpenSearch database, backend API, and frontend UI.
 To generate sample log data for testing, run:
 
 ```sh
-docker compose exec backend python app/utils/populate_logs.py
+python3 backend/app/utils/populate_logs.py
 ```
 
 ### 2. Access the frontend
