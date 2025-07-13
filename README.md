@@ -4,12 +4,15 @@ A fullstack application for searching, filtering, and managing logs using FastAP
 
 ---
 
+
 ## Table of Contents
 
 - [Features](#features)
 - [Getting Started](#getting-started)
 - [Configuration](#configuration)
 - [Usage](#usage)
+- [Troubleshooting](#troubleshooting)
+- [Possible Improvements](#possible-improvements)
 
 ---
 
